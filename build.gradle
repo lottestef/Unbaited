@@ -1,0 +1,46 @@
+plugins {
+    id 'groovy'
+    id 'java'
+    id 'war'
+    
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.apache.httpcomponents:httpclient:4.5.12'
+    compile 'org.apache.httpcomponents.client5:httpclient5-parent:5.0'
+    compile 'org.apache.httpcomponents.client5:httpclient5-fluent:5.0'
+    compile 'org.apache.httpcomponents.client5:httpclient5-cache:5.0'
+    compile 'org.apache.httpcomponents.client5:httpclient5:5.0'
+    // https://mvnrepository.com/artifact/com.google.http-client/google-http-client-jackson2
+    compile group: 'com.google.http-client', name: 'google-http-client-jackson2', version: '1.34.2'
+
+    // https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client
+    compile group: 'com.google.oauth-client', name: 'google-oauth-client', version: '1.30.6'
+    // https://mvnrepository.com/artifact/com.google.api-client/google-api-client-java6
+    compile group: 'com.google.api-client', name: 'google-api-client-java6', version: '1.30.9'
+
+    // https://mvnrepository.com/artifact/com.google.apis/google-api-services-gmail
+    compile group: 'com.google.apis', name: 'google-api-services-gmail', version: 'v1-rev110-1.25.0'
+    // https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-bom
+    compile group: 'com.google.oauth-client', name: 'google-oauth-client-bom', version: '1.30.6', ext: 'pom'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
+    // https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty
+    compile group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.30.6'
+    compile 'org.jsoup:jsoup:1.13.1'
+    // https://mvnrepository.com/artifact/org.json/json
+    compile group: 'org.json', name: 'json', version: '20190722'
+
+}
