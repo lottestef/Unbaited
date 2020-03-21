@@ -1,0 +1,130 @@
+package PhishTank;
+
+import com.google.api.client.json.Json;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONWriter;
+
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PhishTankDriver {
+
+
+    private static HttpURLConnection connection;
+    private static String apikey = "9650e72637eb9f8af1ff88d14bc7dc00d9aa5cf7998e9fbcf0b191c18be373fb";
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader reader;
+        String line;
+        StringBuffer responseContent = new StringBuffer();
+
+        // Method 1: java.net.HttpURLConnection
+        try {
+            URL url = new URL("https://data.phishtank.com/data/9650e72637eb9f8af1ff88d14bc7dc00d9aa5cf7998e9fbcf0b191c18be373fb/online-valid.json");
+            connection = (HttpURLConnection) url.openConnection();
+
+            //Request setup
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            int status = connection.getResponseCode();
+            System.out.println(status);
+
+            if (status > 299) {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+
+                while ((line = reader.readLine()) != null) {
+                    responseContent.append(line);
+                }
+                reader.close();
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+                while ((line = reader.readLine()) != null) {
+                    responseContent.append(line);
+                }
+                reader.close();
+            }
+
+            //System.out.println(responseContent.toString());
+           ArrayList<PhishItem> database =  parse(responseContent.toString());
+            JSONObject jsonPhishingItems = phishItemsAsJSON(database);
+
+            exportToFile("phishTankDB.json",jsonPhishingItems);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    public static ArrayList<PhishItem> parse(String responseBody) {
+        JSONArray database = new JSONArray(responseBody);
+        ArrayList<PhishItem> phishItemDatabase = new ArrayList<>();
+
+        for (int i = 0; i < database.length(); i++) {
+            JSONObject data = database.getJSONObject(i);
+            String url = data.getString("url");
+            String verified = data.getString("verified");
+            String target = data.getString("target");
+            PhishItem information = new PhishItem(url, verified, target);
+            phishItemDatabase.add(information);
+
+           // System.out.println(url + "  " + verified);
+        }
+        return phishItemDatabase;
+    }
+
+    public static JSONObject phishItemToJson(PhishItem p) {
+        JSONObject j = new JSONObject();
+        j.put("url", p.geturl());
+        j.put("verified", p.getverified());
+        j.put("target", p.getTarget());
+        return j;
+    }
+
+    public static JSONObject phishItemsAsJSON(ArrayList<PhishItem> database)
+    {   JSONObject jso = new JSONObject();
+        jso.put("Title: " , "Phishing Data");
+
+        JSONArray array = new JSONArray();
+        for (PhishItem p : database)
+        {
+            JSONObject j = phishItemToJson(p);
+            array.put(j);
+        }
+        jso.put("Data", array);
+        return jso;
+    }
+
+    public static void exportToFile (String fileName, JSONObject itemsToExport)
+    {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try
+        {
+            String itemsAsStr = gson.toJson(itemsToExport);
+            FileWriter fw = new FileWriter(fileName);
+            fw.write(itemsAsStr);
+            fw.close();
+
+        }catch (IOException e)
+        {
+            System.out.println("Failed to write to " + fileName + "!");
+            e.printStackTrace();
+        }
+
+    }
+}
