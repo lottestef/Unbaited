@@ -1,6 +1,7 @@
 package UserData;
+import HttpRequests.Inbox;
 import com.google.api.client.auth.oauth2.Credential;
-
+import HttpRequests.WebRequests;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -39,11 +40,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class User {
     private String userName;
-    private Vector<Message> inbox;
-    private Vector<JSONObject> inboxAsJSON;
-    private Credential credential;
+    private Inbox userInbox;
+    private Gmail service;
+
+    // constructor for the User class
+    public User (String userName)
+    {
+        this.userName = userName;
+        this.userInbox = new Inbox();
+        this.service = WebRequests.getServiceExternally();
+    }
+
+
 
 
 }

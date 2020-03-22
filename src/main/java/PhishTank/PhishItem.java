@@ -21,4 +21,5 @@ public class PhishItem {
         return verified;
     }
     public String getTarget() {return target;};
+
 }

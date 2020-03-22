@@ -40,14 +40,17 @@ public class PhishTankDriver {
 
             int status = connection.getResponseCode();
             System.out.println(status);
+            // status needs to be 200 in order to know that there
+            // has been no errors occurring
 
-            if (status > 299) {
+            if (status > 299) { // get error stream for data to troubleshoot
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
 
                 while ((line = reader.readLine()) != null) {
                     responseContent.append(line);
                 }
                 reader.close();
+                // no connection issues, will use the connection as an input stream
             } else {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -59,11 +62,10 @@ public class PhishTankDriver {
 
             //System.out.println(responseContent.toString());
            ArrayList<PhishItem> database =  parse(responseContent.toString());
+
             JSONObject jsonPhishingItems = phishItemsAsJSON(database);
 
             exportToFile("phishTankDB.json",jsonPhishingItems);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -71,6 +73,8 @@ public class PhishTankDriver {
         }
     }
 
+    // parse the entire list of the response body as an
+    // arraylist of phishItem objects .
     public static ArrayList<PhishItem> parse(String responseBody) {
         JSONArray database = new JSONArray(responseBody);
         ArrayList<PhishItem> phishItemDatabase = new ArrayList<>();
@@ -88,6 +92,8 @@ public class PhishTankDriver {
         return phishItemDatabase;
     }
 
+
+    // convert phishitem to json object
     public static JSONObject phishItemToJson(PhishItem p) {
         JSONObject j = new JSONObject();
         j.put("url", p.geturl());
@@ -95,6 +101,7 @@ public class PhishTankDriver {
         j.put("target", p.getTarget());
         return j;
     }
+
 
     public static JSONObject phishItemsAsJSON(ArrayList<PhishItem> database)
     {   JSONObject jso = new JSONObject();
@@ -109,7 +116,7 @@ public class PhishTankDriver {
         jso.put("Data", array);
         return jso;
     }
-
+    //function that exports the entire phishtank database to a JSON file
     public static void exportToFile (String fileName, JSONObject itemsToExport)
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -127,4 +134,10 @@ public class PhishTankDriver {
         }
 
     }
+    public static boolean inDatabase (String url, String database)
+    {
+        return database.contains(url);
+    }
+
+
 }
