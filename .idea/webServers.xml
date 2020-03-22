@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="8c3d75a0-1aa8-4d0d-9885-7cc9d75db9e9" name="UnbaitedServer" url="http://localhost/">
-        <fileTransfer port="0" mountedRoot="C:\Users\charl\Dropbox\Code Files\Java Files\Unbaited\WebServer" accessType="MOUNT" />
+      <webServer id="63cfe6be-c9d3-40b2-a626-d670225747d8" name="LocalServer" url="http://localhost">
+        <fileTransfer port="0" mountedRoot="C:\Users\charl\Dropbox\LocalServer" accessType="MOUNT" />
       </webServer>
     </option>
   </component>

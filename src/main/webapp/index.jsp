@@ -11,6 +11,7 @@
     <title>$Title$</title>
   </head>
   <body>
+  Welcome to the Unbaited Phishing Detection App
   $END$
   </body>
 </html>

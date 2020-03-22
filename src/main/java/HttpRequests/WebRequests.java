@@ -28,22 +28,19 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebRequests {
-    private static final String APPLICATION_NAME = "Gmail WebRequests";
+    private static final String APPLICATION_NAME = "UnbaitedWebRequests";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_MODIFY);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     /**
      * Creates an authorized Credential object.
@@ -266,7 +263,7 @@ public class WebRequests {
     // return the "No Url Found" message;
     public static String hasURL(JSONObject mail) {
         Pattern p = Pattern.compile("(https?://(www.)?(\\w+)(\\.\\w+))");
-        String mailBody = mail.getString("body");
+        String mailBody = mail.getString("raw");
         Matcher matcher = p.matcher(mailBody);
         if (matcher.find())
         {
