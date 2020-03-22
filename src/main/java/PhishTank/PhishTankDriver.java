@@ -22,15 +22,15 @@ public class PhishTankDriver {
 
     private static HttpURLConnection connection;
     private static String apikey = "9650e72637eb9f8af1ff88d14bc7dc00d9aa5cf7998e9fbcf0b191c18be373fb";
-
-    public static void main(String[] args) throws Exception {
+    private static String link = "https://data.phishtank.com/data/9650e72637eb9f8af1ff88d14bc7dc00d9aa5cf7998e9fbcf0b191c18be373fb/online-valid.json";
+    public static JSONObject getDB() throws Exception {
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-
+        JSONObject jsonPhishingItems = new JSONObject();
         // Method 1: java.net.HttpURLConnection
         try {
-            URL url = new URL("https://data.phishtank.com/data/9650e72637eb9f8af1ff88d14bc7dc00d9aa5cf7998e9fbcf0b191c18be373fb/online-valid.json");
+            URL url = new URL(link);
             connection = (HttpURLConnection) url.openConnection();
 
             //Request setup
@@ -63,14 +63,15 @@ public class PhishTankDriver {
             //System.out.println(responseContent.toString());
            ArrayList<PhishItem> database =  parse(responseContent.toString());
 
-            JSONObject jsonPhishingItems = phishItemsAsJSON(database);
+             jsonPhishingItems = phishItemsAsJSON(database);
 
-            exportToFile("phishTankDB.json",jsonPhishingItems);
+            //exportToFile("phishTankDB.json",jsonPhishingItems);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             connection.disconnect();
         }
+        return jsonPhishingItems;
     }
 
     // parse the entire list of the response body as an
