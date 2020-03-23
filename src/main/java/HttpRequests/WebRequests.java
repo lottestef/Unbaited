@@ -18,7 +18,7 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
 import com.google.gson.GsonBuilder;
 import com.google.gson.Gson;
-import groovy.json.internal.IO;
+
 import org.json.JSONObject;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
@@ -49,7 +49,7 @@ public class WebRequests {
      * @return An authorized Credential object.
      * @throws IOException If the credentials.json file cannot be found.
      */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT,String userId) throws IOException {
         // Load client secrets.
         InputStream in = WebRequests.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
@@ -66,16 +66,16 @@ public class WebRequests {
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        return new AuthorizationCodeInstalledApp(flow, receiver).authorize(userId);
     }
 
     // function that will return a Gmail instance to the caller
-    public static Gmail getServiceExternally() {
+    public static Gmail getServiceExternally(String userId) {
         Gmail service = null;
 
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT,userId))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
         } catch (IOException | GeneralSecurityException e) {
@@ -84,7 +84,7 @@ public class WebRequests {
         return service;
     }
 
-
+    /*
     public static Gmail getService() throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -92,7 +92,7 @@ public class WebRequests {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
         return service;
-        /*
+
         String user = "me";
 
         ListMessagesResponse m = service.users().messages().list(user).execute();
@@ -103,7 +103,7 @@ public class WebRequests {
         for (Message msg : messages) {
             messageIds.add(msg.getId());
 
-        }*/
+        }
     }
 
     // function that will return the entire encoded string
@@ -113,7 +113,7 @@ public class WebRequests {
 
         return StringUtils.newStringUtf8(Base64.decodeBase64(msg.getRaw()));
 
-    }
+    }*/
 
     // function that transforms the message into a mimeMessage,
     // used in order to carry out processing
@@ -222,6 +222,7 @@ public class WebRequests {
     // 'raw' component will have all the text inside it
     public static JSONObject processMessageFully(Gmail service, String userId, String messageId) throws IOException {
         Message m = service.users().messages().get(userId, messageId).setFormat("raw").execute();
+
         JSONObject json = convertToJSON(m);
         MimeMessage mime = null;
 
@@ -234,6 +235,17 @@ public class WebRequests {
         }
 
         json.put("raw", messageText);
+        m = service.users().messages().get(userId, messageId).setFormat("metadata").execute();
+        List<MessagePartHeader> headers = m.getPayload().getHeaders();
+        String value ="";
+        for (MessagePartHeader h : headers)
+        {
+            if (h.getName().equalsIgnoreCase("From"))
+            {
+                value = h.getValue();
+            }
+        }
+        json.put("from", value);
         return json;
     }
 
@@ -261,19 +273,7 @@ public class WebRequests {
 
     // will check if the mail body has a URL, and if it does, return the URL contained within the body, else
     // return the "No Url Found" message;
-    public static String hasURL(JSONObject mail) {
-        Pattern p = Pattern.compile("(https?://(www.)?(\\w+)(\\.\\w+))");
-        String mailBody = mail.getString("raw");
-        Matcher matcher = p.matcher(mailBody);
-        if (matcher.find())
-        {
-            return matcher.group(1);
-        }
-        else
-        {
-            return "No Url Found";
-        }
-    }
+
 
 
 }
