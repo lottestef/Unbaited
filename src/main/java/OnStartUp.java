@@ -57,14 +57,19 @@ public class OnStartUp
         for (int i = 0; i < inbox.size();i++)
         {
             String emailBody = inbox.get(i).getmessageBody();
+            // this means that the email body has a url within
             if (!(hasURL(emailBody).equals("NoUrl")))
             {
                 String testUrl = hasURL(emailBody);
-
+                // if the mail's sender is a blacklisted
+                // address, it is automatically added to the
+                // phish inbox
                 if (inbox.get(i).getSenderAddressInfo().getIsBlackListedAddr())
                 {
                     phishMail.add(inbox.get(i));
                 }
+                //if the database has the url that
+                // is found in the email body
                 else if (phishTankDataBase.contains(testUrl))
                 {
                     phishMail.add(inbox.get(i));
@@ -72,6 +77,7 @@ public class OnStartUp
                     blackList.add(inbox.get(i).getSenderAddressInfo());
 
                 }
+                // if the does not have a url that is in the database and the sender's address is not blacklisted
                 else
                 {
                     safeMail.add(inbox.get(i));
@@ -79,7 +85,7 @@ public class OnStartUp
                 }
             }
             else
-            {
+            {   //if the
                 if (inbox.get(i).getSenderAddressInfo().getIsBlackListedAddr())
                 {
                     phishMail.add(inbox.get(i));
@@ -91,19 +97,12 @@ public class OnStartUp
                 }
             }
 
-
-
-
         }
-
-
-
         UserObj.setSafeMail(safeMail);
         UserObj.setPhishMail(phishMail);
         UserObj.setWhiteList(whiteList);
         UserObj.setBlackList(blackList);
 
-		/* Allow User to manually add WhiteList */ // Should be a function
 					
 		/* Display Inbox */
         System.out.println("Safe mail");
@@ -147,6 +146,7 @@ public class OnStartUp
 
     }
 
+    // function that checks the mail's body to see if it contains a url
     public static String hasURL(String mailBody) {
         Pattern p = Pattern.compile("(https?://(www.)?(\\w+)(\\.\\w+))");
 
